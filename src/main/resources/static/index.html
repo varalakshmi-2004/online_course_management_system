@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduHub Pro | Enterprise Online Course Management System</title>
+  
+  <!-- Modern Font Family: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Top Demo Switcher Utility Bar -->
+  <aside class="demo-quick-bar" aria-label="Demo Credentials Switcher">
+    <div class="demo-bar-inner">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <span style="display: inline-block; width: 8px; height: 8px; background: #22c55e; border-radius: 50%;"></span>
+        <span>Enterprise LMS API: <strong>Spring Security 6 + JWT + MySQL</strong></span>
+      </div>
+      <div class="demo-pills-row">
+        <span>Instant Demo Profiles:</span>
+        <button class="demo-btn" onclick="loginAsDemo('instructor')">👨‍🏫 Test as Instructor (Dr. Turing)</button>
+        <button class="demo-btn" onclick="loginAsDemo('student')">👩‍🎓 Test as Student (Alice)</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main App Navigation Header -->
+  <header class="app-header">
+    <div class="nav-inner">
+      
+      <!-- Brand Logo -->
+      <div class="brand-wrapper" onclick="navigateTo('courses')">
+        <div class="brand-logo-icon">🎓</div>
+        <div class="brand-text-col">
+          <div class="brand-title">
+            <span>EduHub</span>
+            <span class="brand-badge">PRO</span>
+          </div>
+          <span class="brand-subtitle">Learning Management Cloud</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="nav-menu">
+        <button class="nav-link-btn active" id="nav-courses" onclick="navigateTo('courses')">
+          <span class="btn-icon">🌐</span> Explore Catalog
+        </button>
+        <button class="nav-link-btn" id="nav-student" onclick="navigateTo('student')" style="display: none;">
+          <span class="btn-icon">📖</span> My Learning
+        </button>
+        <button class="nav-link-btn" id="nav-instructor" onclick="navigateTo('instructor')" style="display: none;">
+          <span class="btn-icon">⚡</span> Instructor Studio
+        </button>
+        <button class="nav-link-btn" id="nav-notifications" onclick="navigateTo('notifications')">
+          <span class="btn-icon">🔔</span> Alerts
+        </button>
+      </nav>
+
+      <!-- Right Actions: Search, Notification Bell, User Account -->
+      <div class="nav-right-actions">
+        <!-- Live search box -->
+        <div class="nav-search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="globalSearchInput" placeholder="Search courses, skills...">
+        </div>
+
+        <!-- Notification Bell -->
+        <div id="notifBellWrapper" style="display: none;">
+          <button class="notif-bell-btn" onclick="navigateTo('notifications')" title="Notifications & Reminders">
+            <span>🔔</span>
+            <span id="notifBellCounter" class="notif-counter" style="display: none;">0</span>
+          </button>
+        </div>
+
+        <!-- Guest Actions (When logged out) -->
+        <div id="guestActions" style="display: flex; gap: 0.5rem;">
+          <button class="btn-solid-secondary" onclick="openAuthModal('login')">Sign In</button>
+          <button class="btn-solid-primary" onclick="openAuthModal('register')">Sign Up</button>
+        </div>
+
+        <!-- Active User Badge (When logged in) -->
+        <div id="userActions" style="display: none; align-items: center; gap: 0.6rem;">
+          <div class="user-menu-pill">
+            <div class="user-avatar-circle" id="userAvatarInitials">U</div>
+            <div class="user-info-brief">
+              <span class="user-name-text" id="userNameLabel">User Name</span>
+              <span class="user-role-badge" id="userRoleLabel">Student</span>
+            </div>
+          </div>
+          <button class="btn-solid-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" onclick="handleLogout()" title="Sign Out">
+            Exit
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Router Container -->
+  <main class="app-main">
+
+    <!-- ====================================================================
+         VIEW 1: EXPLORE COURSES (COURSE MODULE)
+         ==================================================================== -->
+    <section id="view-courses" class="view-section active">
+      
+      <!-- Hero Banner -->
+      <div class="hero-card">
+        <div class="hero-content">
+          <div class="hero-tag">🚀 Continuous Education Platform</div>
+          <h1 class="hero-title">Advance Your Career with Enterprise Skills</h1>
+          <p class="hero-subtitle">
+            Industry-designed interactive courses featuring high-definition video modules, comprehensive architecture guides, and validated skill assessments.
+          </p>
+
+          <div class="hero-stats-row">
+            <div class="hero-stat-item">
+              <span class="hero-stat-num">2,500+</span>
+              <span class="hero-stat-label">Active Learners</span>
+            </div>
+            <div class="hero-stat-item">
+              <span class="hero-stat-num">99.4%</span>
+              <span class="hero-stat-label">Completion Satisfaction</span>
+            </div>
+            <div class="hero-stat-item">
+              <span class="hero-stat-num">100%</span>
+              <span class="hero-stat-label">Certified Credentials</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Filter Chips -->
+      <div class="filter-bar-wrapper">
+        <div class="category-chips-group" id="categoryPillsContainer">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Course Cards Catalog Grid -->
+      <div class="courses-showcase-grid" id="coursesCatalogGrid">
+        <!-- Rendered courses from backend -->
+      </div>
+    </section>
+
+
+    <!-- ====================================================================
+         VIEW 2: STUDENT DASHBOARD (STUDENT & ENROLLMENT MODULES)
+         ==================================================================== -->
+    <section id="view-student" class="view-section">
+      
+      <!-- Greeting Banner -->
+      <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 1.85rem; font-weight: 800; color: var(--slate-900);">My Learning Hub</h2>
+        <p style="color: var(--slate-500); font-size: 0.95rem;">Track coursework progress, access curriculum materials, and view earned certificates.</p>
+      </div>
+
+      <!-- Metric KPI Cards -->
+      <div class="stats-cards-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon-box kpi-icon-blue">📚</div>
+          <div class="kpi-details">
+            <span class="kpi-value" id="kpiTotalEnrolled">0</span>
+            <span class="kpi-label">Enrolled Courses</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-box kpi-icon-amber">⏳</div>
+          <div class="kpi-details">
+            <span class="kpi-value" id="kpiOngoingCount">0</span>
+            <span class="kpi-label">Active / Ongoing</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-box kpi-icon-green">🏆</div>
+          <div class="kpi-details">
+            <span class="kpi-value" id="kpiCompletedCount">0</span>
+            <span class="kpi-label">Completed Courses</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-box kpi-icon-purple">📊</div>
+          <div class="kpi-details">
+            <span class="kpi-value" id="kpiAvgProgress">0%</span>
+            <span class="kpi-label">Average Progress</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Tabs -->
+      <div class="tabs-header-bar" id="studentTabsContainer">
+        <button class="tab-btn active" id="tabBtn-activeCourses" onclick="switchStudentTab('activeCourses')">
+          In-Progress Courses
+        </button>
+        <button class="tab-btn" id="tabBtn-completedCourses" onclick="switchStudentTab('completedCourses')">
+          Completed &amp; Certificates
+        </button>
+        <button class="tab-btn" id="tabBtn-courseHistory" onclick="switchStudentTab('courseHistory')">
+          Enrollment History &amp; Transcript
+        </button>
+        <button class="tab-btn" id="tabBtn-profileSettings" onclick="switchStudentTab('profileSettings')">
+          Personal Profile
+        </button>
+      </div>
+
+      <!-- Student Tab Panels -->
+      <div id="studentTabPanels">
+        
+        <!-- Panel 1: Active Courses -->
+        <div class="tab-content-panel active" id="panel-activeCourses">
+          <div class="courses-showcase-grid" id="studentActiveGrid">
+            <!-- Active cards injected here -->
+          </div>
+        </div>
+
+        <!-- Panel 2: Completed Courses & Certificates -->
+        <div class="tab-content-panel" id="panel-completedCourses">
+          <div class="courses-showcase-grid" id="studentCompletedGrid">
+            <!-- Completed cards injected here -->
+          </div>
+        </div>
+
+        <!-- Panel 3: Enrollment History -->
+        <div class="tab-content-panel" id="panel-courseHistory">
+          <div class="table-panel-card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Course Title</th>
+                    <th>Category</th>
+                    <th>Enrollment Date</th>
+                    <th>Completion Date</th>
+                    <th>Status</th>
+                    <th>Progress</th>
+                    <th>Score / Grade</th>
+                  </tr>
+                </thead>
+                <tbody id="studentHistoryTableBody">
+                  <!-- History rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 4: Personal Profile -->
+        <div class="tab-content-panel" id="panel-profileSettings">
+          <div class="table-panel-card" style="max-width: 680px; padding: 2rem;">
+            <h3 style="font-weight: 800; margin-bottom: 0.35rem;">Update Personal Details</h3>
+            <p style="color: var(--slate-500); font-size: 0.88rem; margin-bottom: 1.5rem;">Keep your contact details up-to-date for certification and instructor communications.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+              <div>
+                <label class="form-label">Full Name</label>
+                <input type="text" id="studentProfileName" class="form-control" placeholder="e.g. Alice Walker">
+              </div>
+
+              <div>
+                <label class="form-label">Email Address (Registered Login)</label>
+                <input type="email" id="studentProfileEmail" class="form-control" disabled style="background: var(--slate-100);">
+              </div>
+
+              <div>
+                <label class="form-label">Contact Telephone</label>
+                <input type="text" id="studentProfileContact" class="form-control" placeholder="e.g. +1-555-0202">
+              </div>
+
+              <div style="margin-top: 0.5rem;">
+                <button class="btn-solid-primary" onclick="saveStudentProfileChanges()">
+                  Save Profile Updates
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ====================================================================
+         VIEW 3: INSTRUCTOR STUDIO (INSTRUCTOR MODULE)
+         ==================================================================== -->
+    <section id="view-instructor" class="view-section">
+      
+      <!-- Studio Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="font-size: 1.85rem; font-weight: 800; color: var(--slate-900);">Instructor Studio</h2>
+          <p style="color: var(--slate-500); font-size: 0.95rem;">Curate courses, assign multi-format coursework, and monitor student performance.</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <button class="btn-solid-secondary" onclick="triggerAutomatedReminders()">
+            🔔 Send Coursework Reminders
+          </button>
+          <button class="btn-solid-primary" onclick="openCreateCourseModal()">
+            + Create New Course
+          </button>
+        </div>
+      </div>
+
+      <!-- Instructor KPIs -->
+      <div class="stats-cards-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon-box kpi-icon-blue">🎓</div>
+          <div class="kpi-details">
+            <span class="kpi-value" id="instKpiTotalCourses">0</span>
+            <span class="kpi-label">Courses Taught</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-box kpi-icon-amber">👥</div>
+          <div class="kpi-details">
+            <span class="kpi-value" id="instKpiTotalStudents">0</span>
+            <span class="kpi-label">Total Enrollments</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-box kpi-icon-green">🎖</div>
+          <div class="kpi-details">
+            <span class="kpi-value" id="instKpiCompletedStudents">0</span>
+            <span class="kpi-label">Graduated Learners</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-box kpi-icon-purple">⭐</div>
+          <div class="kpi-details">
+            <span class="kpi-value" id="instKpiAvgScore">0%</span>
+            <span class="kpi-label">Class Average Score</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instructor Tabs -->
+      <div class="tabs-header-bar" id="instructorTabsContainer">
+        <button class="tab-btn active" id="instTabBtn-coursesList" onclick="switchInstructorTab('coursesList')">
+          My Published Courses
+        </button>
+        <button class="tab-btn" id="instTabBtn-studentRoster" onclick="switchInstructorTab('studentRoster')">
+          Student Performance &amp; Gradebook
+        </button>
+      </div>
+
+      <!-- Instructor Tab Panels -->
+      <div id="instructorTabPanels">
+        
+        <!-- Panel 1: Published Courses Table -->
+        <div class="tab-content-panel active" id="instPanel-coursesList">
+          <div class="table-panel-card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Course ID</th>
+                    <th>Course Title</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Curriculum Count</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="instructorCoursesTableBody">
+                  <!-- Course rows injected here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Student Performance & Gradebook -->
+        <div class="tab-content-panel" id="instPanel-studentRoster">
+          <div class="table-panel-card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Enrolled Course</th>
+                    <th>Student Info</th>
+                    <th>Enrollment Date</th>
+                    <th>Status</th>
+                    <th>Progress</th>
+                    <th>Assigned Grade</th>
+                    <th>Enter Score (0-100)</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="instructorStudentsTableBody">
+                  <!-- Student performance rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ====================================================================
+         VIEW 4: NOTIFICATIONS & ALERTS FEED (NOTIFICATION MODULE)
+         ==================================================================== -->
+    <section id="view-notifications" class="view-section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="font-size: 1.85rem; font-weight: 800; color: var(--slate-900);">Notification Center</h2>
+          <p style="color: var(--slate-500); font-size: 0.95rem;">Alerts for new course publications, coursework reminders, and student enrollments.</p>
+        </div>
+        <button class="btn-solid-secondary" onclick="triggerAutomatedReminders()">
+          🔔 Trigger Coursework Reminders Scan
+        </button>
+      </div>
+
+      <div id="notificationsFeedList" style="display: flex; flex-direction: column; gap: 1rem; max-width: 900px;">
+        <!-- Notification cards rendered here -->
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ====================================================================
+       MODALS & SLIDE-OVER PANELS
+       ==================================================================== -->
+
+  <!-- 1. Authentication Modal (Sign In / Register) -->
+  <div class="modal-backdrop" id="authModalBackdrop">
+    <div class="modal-dialog" style="max-width: 460px;">
+      <div class="modal-header">
+        <h3 id="authModalHeading">Welcome to EduHub</h3>
+        <button class="modal-close-btn" onclick="closeAuthModal()">&times;</button>
+      </div>
+
+      <div style="display: flex; border-bottom: 1px solid var(--border-subtle);">
+        <button class="tab-btn active" id="loginTabBtn" style="flex: 1; text-align: center;" onclick="switchAuthTab('login')">Sign In</button>
+        <button class="tab-btn" id="registerTabBtn" style="flex: 1; text-align: center;" onclick="switchAuthTab('register')">Create Account</button>
+      </div>
+
+      <div class="modal-body">
+        <div id="authErrorBox" class="badge-pill badge-dropped" style="display: none; width: 100%; margin-bottom: 1rem; border-radius: 8px; padding: 0.6rem 0.85rem;"></div>
+
+        <!-- Login Form -->
+        <div id="loginFormContainer">
+          <form onsubmit="handleLoginSubmit(event)">
+            <div style="margin-bottom: 1rem;">
+              <label class="form-label">Email Address</label>
+              <input type="email" id="loginEmailInput" class="form-control" placeholder="user@learn.com" required>
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+              <label class="form-label">Password</label>
+              <input type="password" id="loginPasswordInput" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-solid-primary" style="width: 100%;">Sign In</button>
+          </form>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerFormContainer" style="display: none;">
+          <form onsubmit="handleRegisterSubmit(event)">
+            <div style="margin-bottom: 1rem;">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="regNameInput" class="form-control" placeholder="Jane Doe" required>
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <label class="form-label">Email Address</label>
+              <input type="email" id="regEmailInput" class="form-control" placeholder="jane@learn.com" required>
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <label class="form-label">Password</label>
+              <input type="password" id="regPasswordInput" class="form-control" placeholder="••••••••" required>
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <label class="form-label">Contact Number</label>
+              <input type="text" id="regContactInput" class="form-control" placeholder="+1-555-0100">
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <label class="form-label">I want to join as a:</label>
+              <select id="regRoleSelect" class="form-control" onchange="toggleInstructorFields()">
+                <option value="ROLE_STUDENT">Student (Take courses &amp; earn certificates)</option>
+                <option value="ROLE_INSTRUCTOR">Instructor (Teach &amp; publish courses)</option>
+              </select>
+            </div>
+            <div id="instructorSpecGroup" style="display: none; margin-bottom: 1.5rem;">
+              <label class="form-label">Teaching Specialization</label>
+              <input type="text" id="regSpecInput" class="form-control" placeholder="e.g. Distributed Systems &amp; Cloud">
+            </div>
+            <button type="submit" class="btn-solid-primary" style="width: 100%;">Create Account</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 2. Interactive Classroom Player Modal (For Student Learning) -->
+  <div class="modal-backdrop" id="classroomModalBackdrop">
+    <div class="modal-dialog" style="max-width: 1080px; width: 95%;">
+      <div class="modal-header">
+        <div>
+          <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--primary-600);">Classroom Player</span>
+          <h3 id="playerCourseTitle">Course Title</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeClassroomPlayer()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Overall Progress Header -->
+        <div style="margin-bottom: 1.5rem; background: var(--slate-50); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1rem 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <strong style="font-size: 0.88rem; color: var(--slate-800);">Your Course Completion Progress</strong>
+            <strong style="font-size: 0.95rem; color: var(--primary-700);" id="classroomProgressPercent">0%</strong>
+          </div>
+          <div class="progress-track-subtle" style="height: 10px;">
+            <div class="progress-bar-fill" id="classroomProgressBar" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Player Split Layout -->
+        <div class="player-layout">
+          <!-- Active Lesson Screen (Video / PDF / Quiz) -->
+          <div class="player-main-col" id="lessonDisplayContainer">
+            <!-- Dynamic lesson screen -->
+          </div>
+
+          <!-- Playlist / Curriculum Sidebar -->
+          <div class="curriculum-playlist-card">
+            <h4 style="font-size: 0.92rem; font-weight: 800; color: var(--slate-900); margin-bottom: 0.75rem;">Coursework Playlist</h4>
+            <div id="classroomPlaylistContainer" style="max-height: 480px; overflow-y: auto;">
+              <!-- Playlist items -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <button class="btn-solid-primary" id="classroomCertUnlockBtn" style="display: none;" onclick="openCompletedCertificateFromPlayer()">
+            📜 View Certificate of Completion
+          </button>
+        </div>
+        <button class="btn-solid-secondary" onclick="closeClassroomPlayer()">Close Player</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 3. Official Certificate Modal -->
+  <div class="modal-backdrop" id="certificateModalBackdrop">
+    <div class="modal-dialog" style="max-width: 760px;">
+      <div class="modal-header">
+        <h3>Official Certificate of Completion</h3>
+        <button class="modal-close-btn" onclick="closeCertificateModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="certificate-preview-box">
+          <div class="cert-corner-icon">🎖</div>
+          <h2 class="cert-main-title">Certificate of Achievement</h2>
+          <div class="cert-subtitle">This credential verifies that</div>
+          <div class="cert-student-name" id="certStudentNameDisplay">Student Name</div>
+          <p class="cert-body-text">
+            has successfully completed all required coursework, video modules, and performance assessments for
+            <br><strong style="font-size: 1.15rem; color: var(--slate-900);" id="certCourseTitleDisplay">Full-Stack Java Masterclass</strong>.
+          </p>
+          <div class="cert-footer-meta">
+            <div>
+              <span>Date Issued</span><br>
+              <strong id="certDateDisplay">November 2026</strong>
+            </div>
+            <div>
+              <span>Honors Grade</span><br>
+              <strong id="certGradeDisplay" style="color: var(--accent-emerald);">A (Excellent)</strong>
+            </div>
+            <div>
+              <span>Verification ID</span><br>
+              <strong id="certIdDisplay">EDU-849201</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-solid-secondary" onclick="window.print()">🖨 Print / Download PDF</button>
+        <button class="btn-solid-primary" onclick="closeCertificateModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 4. Course Creator Modal (Instructor) -->
+  <div class="modal-backdrop" id="createCourseModalBackdrop">
+    <div class="modal-dialog" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3>Create New Course</h3>
+        <button class="modal-close-btn" onclick="closeCreateCourseModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form onsubmit="handleCreateCourseSubmit(event)">
+          <div style="margin-bottom: 1.15rem;">
+            <label class="form-label">Course Title</label>
+            <input type="text" id="newCourseTitleInput" class="form-control" placeholder="e.g. Distributed Cloud Native Architecture" required>
+          </div>
+
+          <div style="margin-bottom: 1.15rem;">
+            <label class="form-label">Category</label>
+            <select id="newCourseCategorySelect" class="form-control">
+              <option value="Software Engineering">Software Engineering</option>
+              <option value="Artificial Intelligence">Artificial Intelligence</option>
+              <option value="Cloud Computing">Cloud Computing</option>
+              <option value="Data Science">Data Science</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label class="form-label">Course Description &amp; Objectives</label>
+            <textarea id="newCourseDescInput" class="form-control" rows="4" placeholder="Detail the technical outcomes, target audience, and curriculum structure..."></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button type="button" class="btn-solid-secondary" onclick="closeCreateCourseModal()">Cancel</button>
+            <button type="submit" class="btn-solid-primary">Publish Course</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 5. Curriculum Builder Drawer / Modal (Instructor) -->
+  <div class="modal-backdrop" id="curriculumModalBackdrop">
+    <div class="modal-dialog" style="max-width: 740px;">
+      <div class="modal-header">
+        <h3 id="curriculumModalTitle">Curriculum Builder</h3>
+        <button class="modal-close-btn" onclick="closeCurriculumBuilder()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Existing Items List -->
+        <h4 style="font-weight: 700; margin-bottom: 0.75rem; color: var(--slate-900);">Current Curriculum Materials</h4>
+        <div id="curriculumItemsList" style="max-height: 240px; overflow-y: auto; margin-bottom: 1.5rem;">
+          <!-- Items injected -->
+        </div>
+
+        <!-- Add Material Form -->
+        <div style="background: var(--slate-50); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 1.25rem;">
+          <h4 style="font-weight: 800; font-size: 1rem; color: var(--slate-900); margin-bottom: 1rem;">+ Assign New Material (Video, PDF, Quiz)</h4>
+          
+          <form onsubmit="handleAddContentSubmit(event)">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <label class="form-label">Material Title</label>
+                <input type="text" id="newContentTitleInput" class="form-control" placeholder="e.g. Lesson 2: Spring Security Filters" required>
+              </div>
+
+              <div>
+                <label class="form-label">Content Type</label>
+                <select id="newContentTypeSelect" class="form-control">
+                  <option value="VIDEO">📹 Video Lecture</option>
+                  <option value="PDF">📄 PDF Guide / Slides</option>
+                  <option value="QUIZ">📝 Interactive Quiz</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <label class="form-label">Resource URL / Cloud File Link</label>
+              <input type="text" id="newContentUrlInput" class="form-control" placeholder="https://youtube.com/... or https://docs...">
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <label class="form-label">Quiz Question &amp; Options (For QUIZ type)</label>
+              <textarea id="newContentQuizInput" class="form-control" rows="2" placeholder="Q1: What filter parses JWT? A) OncePerRequestFilter B) BasicAuthFilter"></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+              <div>
+                <label class="form-label">Estimated Duration (Minutes)</label>
+                <input type="number" id="newContentDurationInput" class="form-control" value="30">
+              </div>
+            </div>
+
+            <button type="submit" class="btn-solid-primary" style="width: 100%;">
+              Add Material to Curriculum
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-solid-secondary" onclick="closeCurriculumBuilder()">Done</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 6. Syllabus / Curriculum Preview Modal (Student Browse) -->
+  <div class="modal-backdrop" id="curriculumPreviewModalBackdrop">
+    <div class="modal-dialog" style="max-width: 620px;">
+      <div class="modal-header">
+        <h3 id="previewModalTitle">Course Syllabus</h3>
+        <button class="modal-close-btn" onclick="closeCurriculumPreview()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div id="previewLessonsList" style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <!-- Syllabus items -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-solid-secondary" onclick="closeCurriculumPreview()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Instructor Material Test / Preview Modal -->
+  <div class="modal-backdrop" id="instructorPreviewModalBackdrop">
+    <div class="modal-dialog" style="max-width: 820px; width: 95%;">
+      <div class="modal-header">
+        <h3 id="instPreviewTitle">Material Preview</h3>
+        <button class="modal-close-btn" onclick="closeInstructorPreviewModal()">&times;</button>
+      </div>
+
+      <div class="modal-body" id="instPreviewBody">
+        <!-- Rendered preview -->
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-solid-secondary" onclick="closeInstructorPreviewModal()">Close Preview</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Script -->
+  <script src="/js/app.js"></script>
+</body>
+</html>
